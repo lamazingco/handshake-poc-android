@@ -15,6 +15,7 @@ public class ShakeDetector implements SensorEventListener {
     public static final int SENSITIVITY_MEDIUM = 13;
     public static final int SENSITIVITY_HARD = 15;
 
+    private static final int SENSOR_UPDATE_INTERVAL_MICROSECONDS = 100000;
     private static final int DEFAULT_ACCELERATION_THRESHOLD = SENSITIVITY_LIGHT;
 
     /**
@@ -57,7 +58,7 @@ public class ShakeDetector implements SensorEventListener {
         if (accelerometer != null) {
             this.sensorManager = sensorManager;
             sensorManager.registerListener(this, accelerometer,
-                    SensorManager.SENSOR_DELAY_FASTEST);
+                    SENSOR_UPDATE_INTERVAL_MICROSECONDS);
         }
         return accelerometer != null;
     }
@@ -81,7 +82,7 @@ public class ShakeDetector implements SensorEventListener {
         queue.add(timestamp, accelerating, event);
         if (queue.isShaking()) {
             queue.clear();
-            Log.d("onShake detected", "timestamp ns:" + event.timestamp);
+            //Log.d("onShake detected", "timestamp ns:" + event.timestamp);
             listener.hearShake();
         }
     }
@@ -95,13 +96,7 @@ public class ShakeDetector implements SensorEventListener {
         float ay = event.values[1];
         float az = event.values[2];
 
-        float diffAx = Math.abs(ax - queue.newest.ax);
-        float diffAy = Math.abs(ay - queue.newest.ay);
-        float diffAz = Math.abs(az - queue.newest.az);
-
-        if (diffAx > 1 || diffAy > 1 || diffAz > 1) {
-            Log.d("onSensorChanged","timestamp ns:" + event.timestamp + " ax=" + ax + " ay=" + ay + " az=" + az);
-        }
+        Log.d("onSensorChanged","timestamp:" + System.currentTimeMillis()/100 + " ax=" + ax + " ay=" + ay + " az=" + az);
     }
 
     /** Returns true if the device is currently accelerating. */
@@ -271,3 +266,6 @@ public class ShakeDetector implements SensorEventListener {
     @Override public void onAccuracyChanged(Sensor sensor, int accuracy) {
     }
 }
+
+
+
