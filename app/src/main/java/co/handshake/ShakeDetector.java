@@ -18,6 +18,8 @@ public class ShakeDetector implements SensorEventListener {
     private static final int SENSOR_UPDATE_INTERVAL_MICROSECONDS = 100000;
     private static final int DEFAULT_ACCELERATION_THRESHOLD = SENSITIVITY_LIGHT;
 
+    private long lastTimeStamp;
+
     /**
      * When the magnitude of total acceleration exceeds this
      * value, the phone is accelerating.
@@ -52,7 +54,7 @@ public class ShakeDetector implements SensorEventListener {
         }
 
         accelerometer = sensorManager.getDefaultSensor(
-                Sensor.TYPE_ACCELEROMETER);
+                Sensor.TYPE_LINEAR_ACCELERATION);
 
         // If this phone has an accelerometer, listen to it.
         if (accelerometer != null) {
@@ -92,11 +94,16 @@ public class ShakeDetector implements SensorEventListener {
             return;
         }
 
-        float ax = event.values[0];
-        float ay = event.values[1];
-        float az = event.values[2];
+        float ax = event.values[0]/10;
+        float ay = event.values[1]/10;
+        float az = event.values[2]/10;
 
-        Log.d("onSensorChanged","timestamp:" + System.currentTimeMillis()/100 + " ax=" + ax + " ay=" + ay + " az=" + az);
+        long timestamp = System.currentTimeMillis()/100;
+        if (timestamp != lastTimeStamp) {
+            Log.d("onSensorChanged","timestamp:" + System.currentTimeMillis()/100 + " ax=" + ax + " ay=" + ay + " az=" + az);
+            lastTimeStamp = timestamp;
+        }
+
     }
 
     /** Returns true if the device is currently accelerating. */
